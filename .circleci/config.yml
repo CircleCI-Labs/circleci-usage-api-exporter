@@ -18,8 +18,8 @@ jobs:
             pip3 install requests pandas matplotlib
       - run:
           environment:
-            START_DATE: "2025-01-15"
-            END_DATE: "2025-02-15"
+            START_DATE: "2025-03-01"
+            END_DATE: "2025-04-01"
             ORG_ID: << pipeline.parameters.org_id >>
           name: Get Usage Report
           command: |
@@ -29,12 +29,41 @@ jobs:
           name: Merge multiple csv files together and do some sorting 
           command: |
             python ./src/merge.py
+      - run:
+          name: Create a graph from the merged data 
+          command: |
+            python ./src/create_graph.py
+      - persist_to_workspace:
+          root: /tmp/reports
+          paths:
+            - merged.csv
       - store_artifacts:
           path: /tmp/reports
+  send-metrics-to-datadog:
+    docker:
+      - image: cimg/python:3.13.1
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp
+      - run:
+          name: Install dependencies
+          command: |
+            pip3 install datadog-api-client
+      - run:
+          name: Send metrics to Datadog
+          command: |
+            python ./src/send_to_datadog.py /tmp/merged.csv
 
 workflows:
   use-usage-api:
     jobs:
       - generate-usage-report:
+          context:
+            - my-context
+      - send-metrics-to-datadog:
+          requires:
+            - generate-usage-report
           context:
             - my-context

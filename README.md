@@ -19,6 +19,10 @@ For more info on the API itself, visit the docs [here](https://circleci.com/docs
 
 All the outputs are saved as an [artifact](https://circleci.com/docs/artifacts/) on CircleCI.
 
+### Just added - Datadog Metrics
+
+The project has been updated to include a script that will parse the merged csv files, and send these as custom metrics to Datadog for analysis.
+
 ### Use Cases
 
 While the implementation shown in this project is simple, there are many use cases for implementing the Usage API in this way. 
@@ -42,7 +46,10 @@ To learn more about graphs using python, check out [Matplotlib](https://matplotl
 - A CircleCI [personal API token](https://circleci.com/docs/managing-api-tokens/#creating-a-personal-api-token) is required in order to use the API. This is saved with the name `CIRCLECI_API_TOKEN`, in a context.
 - A date range is required. These are specified using the `START_DATE` and `END_DATE` environment variables
 - An organisation ID is required. This defaults to the ID of the organisation that is executing the job on CircleCI.
+- If sending metrics to Datadog, then a `DATADOG_API_KEY` is required.
 
 ### Caveats
 
-- My python skillz aren't great
+- My python skillz aren't great.
+- If using Datadog, there will be extra charges for storing these custom metrics. See
+    - Alternatives include using the [CircleCI Datadog integration](https://docs.datadoghq.com/integrations/circleci/), as well as [outbound  webhooks](https://circleci.com/docs/webhooks/#outbound-webhooks) from CircleCI.
